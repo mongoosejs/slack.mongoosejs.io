@@ -1,0 +1,68 @@
+<html>
+  <head>
+    <title>
+      Mongoose Slack
+    </title>
+  </head>
+
+  <body>
+    <link rel="stylesheet" href="style.css" />
+
+    <img class="logo" src="images/mongoose.svg" />
+
+    <h1>Mongoose Slack Channel</h1>
+    <div>
+      <div>
+        <form id="emailForm">
+          <input type="text" id="email" placeholder="Email" />
+
+          <button type="button">Request Invite</button>
+        </form>
+        <div id="success">
+          Request for invite sent successfully!
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const form = document.querySelector('#emailForm');
+      form.addEventListener('submit', submitForm);
+
+      const emailInput = document.querySelector('#email');
+      const emailRegexp = /^[a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+$/;
+      const success = document.querySelector('#success');
+      const button = document.querySelector('#emailForm button');
+      const endpoint = 'https://mongoosejs.azurewebsites.net/api/requestslackinvite';
+
+      function submitForm(ev) {
+        ev.preventDefault();
+        const email = emailInput.value;
+
+        if (!emailRegexp.test(email)) {
+          console.error('Invalid email', email);
+          emailInput.classList.add('error');
+          return;
+        }
+        emailInput.classList.remove('error');
+        form.disabled = true;
+        button.disabled = true;
+
+        fetch(`${endpoint}?email=${encodeURIComponent(email)}`).
+          then(res => res.json()).
+          then(res => {
+            if (res.success) {
+              success.classList.add('show');
+            } else {
+              form.disabled = false;
+              button.disabled = false;
+            }
+          }).
+          catch(err => {
+            console.error(err);
+            form.disabled = false;
+            button.disabled = false;
+          });
+      }
+    </script>
+  </body>
+</html>
